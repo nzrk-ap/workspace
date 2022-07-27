@@ -1,0 +1,37 @@
+/* td {
+  width: calc(100% /);
+} */
+
+td {
+  max-width: 100px;
+  max-height: 150px;
+  padding: 5px;
+}
+
+select {
+  margin-top: 3px;
+}
+
+td.title {
+  text-transform: capitalize;
+  font-weight: bold;
+  text-align: center;
+}
+
+td.row {
+  font-weight: 600;
+}
+
+textarea {
+  height: 75px;
+  resize: none;
+  font-size: 11px;
+  text-align: left;
+  vertical-align: top;
+}
+
+svg.add {
+  width: 16px;
+  height: 16px;
+  fill: currentColor;
+}
