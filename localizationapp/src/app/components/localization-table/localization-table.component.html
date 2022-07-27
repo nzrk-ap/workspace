@@ -1,0 +1,56 @@
+<h3>Localization Table</h3>
+<table class="table table-light">
+  <thead>
+    <tr>
+      <td><b>Fields</b></td>
+      <td class="title">{{ defaultLanguage }}</td>
+      <td
+        *ngFor="let language of languages | filterlanguages: defaultLanguage"
+        class="title"
+      >
+        {{ language }}
+      </td>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let row of rows">
+      <td class="text-dark row">{{ row }}</td>
+      <td>
+        <textarea class="form-control" type="text">
+          {{ getColumnLocalization(row, defaultLanguage) }}
+      </textarea
+        >
+      </td>
+      <td *ngFor="let language of languages | filterlanguages: defaultLanguage">
+        <textarea class="form-control" type="text">
+          {{ getColumnLocalization(row, language) }}
+      </textarea
+        >
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <button class="btn btn-primary" (click)="addField()">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="bi bi-plus add"
+            viewBox="0 0 16 16"
+          >
+            <path
+              d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"
+            />
+          </svg>
+        </button>
+        <div *ngIf="addFieldVisible">
+          <select name="select-column" class="custom-select">
+            <option *ngFor="let field of fieldsToAdd">{{ field }}</option>
+          </select>
+        </div>
+      </td>
+      <td><textarea class="form-control"></textarea></td>
+      <td *ngFor="let language of languages | filterlanguages: defaultLanguage">
+        <textarea class="form-control"></textarea>
+      </td>
+    </tr>
+  </tbody>
+</table>
