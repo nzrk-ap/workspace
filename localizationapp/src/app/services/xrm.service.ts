@@ -36,22 +36,11 @@ export class XrmService {
   }
 
   getCurrentEntity(): { logicalName: string; id: string } {
-    debugger;
     let xrm = <any>this.xrm;
     let id = xrm.Page.data.entity.getId().replace(/[{}]/g, '');
     let entityName = xrm.Page.data.entity.getEntityName();
     return { logicalName: entityName, id: id };
   }
-
-  callRequest(): Observable<any> {
-    let observable = new Observable((observer) => {
-      observer.next('test_message');
-    });
-
-    return observable;
-  }
-
-
 
   callActionTracking(actionName: string, data: any): Observable<any> {
     let observable = new Observable((observer) => {
