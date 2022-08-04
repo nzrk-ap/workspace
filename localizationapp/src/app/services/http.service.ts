@@ -14,4 +14,21 @@ export class HttpService {
       )
       .pipe(map((result) => <LocalizationResponse>result));
   }
+
+  save(data: string) {
+    let input = JSON.stringify(data);
+    console.log();
+    return this.httpClient.put(
+      'https://func-hcmlms-sync-dev.azurewebsites.net/api/localization/sb_goaltemplate/BEF97D11-94EB-EB11-BACB-000D3A474263?code=31Qv6Tg7g0slsMvQBadpRQSdDckMZripcxxlSfVsbbefTv2mGYInZg==',
+      input,
+      {
+        headers: new HttpHeaders({
+          'Content-Type': 'application/json'
+        })
+      });
+  }
+
+  getAttributeMap(): Observable<string> {
+    return this.httpClient.get<string>('../configuration/attributemap.json');
+  }
 }
