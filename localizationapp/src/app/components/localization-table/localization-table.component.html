@@ -1,12 +1,12 @@
 <form #formParam="ngForm" (ngSubmit)="onSubmit(formParam)">
-  <table class="table table-light" name="localization-table">
+  <table class="table table-light" name="localization-table" *ngIf="displayTable()">
     <thead>
       <tr>
-        <th class="field text-dark brdr">Fields</th>
-        <th class="title text-dark brdr">{{ defaultLanguage }}</th>
+        <th class="field text-dark header-border">Fields</th>
+        <th class="title text-dark header-border">{{ defaultLanguage }}</th>
         <th
           *ngFor="let language of languages | filterlanguages: defaultLanguage"
-          class="title text-dark brdr"
+          class="title text-dark header-border"
         >
           {{ language }}
         </th>
@@ -46,10 +46,10 @@
       <div class="col-md-1 col-padding">
         <div *ngIf="localization.length != 0"><fluent-button appearance="accent" type="submit">Save</fluent-button></div>
       </div>
-      <div class="col-md-3">
+      <div class="col-md-8">
         <span *ngIf="isSaved"><h4 class="text-dark">Successfully saved</h4></span>
         <span *ngIf="isIncorrectResponse"><h4 class="text-danger">Incorrect response: {{responseText}}</h4></span>
-        <span *ngIf="isError"><h4 class="text-error">Execution error. See console logs</h4></span>
+        <span *ngIf="isError"><h4 class="text-error">Application error. See console logs</h4></span>
       </div>
     </div>
   </div>

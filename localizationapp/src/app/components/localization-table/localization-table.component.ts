@@ -16,6 +16,7 @@ export class LocalizationTableComponent implements OnInit {
     private xrmService: XrmService) { }
 
   private ACTION_TRACKING_NAME: string = 'SendLocalizationRequest';
+
   public localization = new Array<LocalizationItem>();
   public rows: string[] = [];
   public languages: string[] = [];
@@ -49,7 +50,6 @@ export class LocalizationTableComponent implements OnInit {
           else {
             this.handleIncorrectResponse(responseObj.Message);
           }
-
         }, error: (err) => { this.handleError(err) }
       });
   }
@@ -89,6 +89,10 @@ export class LocalizationTableComponent implements OnInit {
     } else return '';
   }
 
+  public displayTable(): boolean {
+    return this.rows.length != 0 && this.languages.length != 0;
+  }
+
   private collectData(formParam: NgForm): any {
     let data: any = {};
     let cellKeys = Object.keys(formParam.value);
@@ -107,8 +111,8 @@ export class LocalizationTableComponent implements OnInit {
 
   private handleLocalizationResponse(result: LocalizationResponse) {
     this.defaultLanguage = result.defaultLanguage;
-    this.rows = result.columns;
     this.languages = result.languages;
+    this.rows = result.columns;
     for (let item of Object.keys(result.localization)) {
       this.localization.push({
         language: item, ...(<any>result.localization)[item],
@@ -118,20 +122,20 @@ export class LocalizationTableComponent implements OnInit {
   }
 
   private handleIncorrectResponse(message: any) {
-    this.isError = true;
+    this.isIncorrectResponse = true;
     if (message) {
       this.responseText = JSON.parse(message);
     } else {
-      this.responseText = 'Empty response';
+      this.responseText = `Has no data. Check azure function`;
     }
     setTimeout(() => {
-      this.isError = true;
+      this.isIncorrectResponse = false;
       this.responseText = '';
     }, 5000);
   }
 
   private handleError(error: any) {
-    console.error(`Execution error is ${error}`);
+    console.error(`Application error is ${error}`);
     this.isError = true;
     setTimeout(() => this.isError = false, 5000);
   }

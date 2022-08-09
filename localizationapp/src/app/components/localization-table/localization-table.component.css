@@ -1,6 +1,5 @@
 
 td {
-  max-width: 200px;
   max-height: 150px;
   padding: 5px;
 }
@@ -19,7 +18,7 @@ th.title {
   text-align: center;
 }
 
-th.brdr {
+th.header-border {
   border-bottom: solid 1px #3b79b7;
 }
 
@@ -39,6 +38,7 @@ textarea {
   vertical-align: top;
   padding-left: 3px;
   padding-top: 0px;
+  max-width: 200px;
 }
 
 fluent-button {
