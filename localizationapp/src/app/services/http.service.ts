@@ -1,11 +1,11 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { map, Observable } from 'rxjs';
+import { catchError, map, Observable } from 'rxjs';
 import { LocalizationResponse } from '../models/localizationresponse';
 
 @Injectable({ providedIn: 'root' })
 export class HttpService {
-  constructor(private httpClient: HttpClient) {}
+  constructor(private httpClient: HttpClient) { }
 
   getLocalization(): Observable<LocalizationResponse> {
     return this.httpClient
@@ -26,9 +26,5 @@ export class HttpService {
           'Content-Type': 'application/json'
         })
       });
-  }
-
-  getAttributeMap(): Observable<string> {
-    return this.httpClient.get<string>('../configuration/attributemap.json');
   }
 }

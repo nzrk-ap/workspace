@@ -1,6 +1,6 @@
 export class LocalizationRequest {
-  EntityLogicalName: string | undefined;
-  EntityId: string | undefined;
-  Method: string | undefined;
-  Data: string | undefined;
+  EntityLogicalName!: string;
+  EntityId!: string;
+  Method!: string;
+  Data!: string;
 }

@@ -1,54 +1,86 @@
-import { Component, OnInit, Output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit, Output } from '@angular/core';
 import { LocalizationRequest } from 'src/app/models/localizationrequest';
 import { XrmService } from '../../services/xrm.service';
-import { HttpService } from '../../services/http.service';
 import { LocalizationResponse } from '../../models/localizationresponse';
 import { LocalizationItem } from 'src/app/models/localizationitem';
-import { FormGroup, NgForm } from '@angular/forms';
+import { NgForm } from '@angular/forms';
 
 @Component({
   selector: 'app-localization-table',
   templateUrl: './localization-table.component.html',
   styleUrls: ['./localization-table.component.css'],
+  changeDetection: ChangeDetectionStrategy.Default
 })
 export class LocalizationTableComponent implements OnInit {
   constructor(
-    private xrmService: XrmService,
-    private HttpService: HttpService
-  ) {}
+    private xrmService: XrmService) { }
 
   private ACTION_TRACKING_NAME: string = 'SendLocalizationRequest';
-  public defaultLanguage!: string;
+  public localization = new Array<LocalizationItem>();
+  public rows: string[] = [];
   public languages: string[] = [];
+  public defaultLanguage!: string;
+
+  public isSaved: boolean = false;
+  public isIncorrectResponse: boolean = false;
+  public isError: boolean = false;
+  public responseText!: string;
 
   ngOnInit(): void {
     this.onLoad();
   }
 
   onLoad() {
-    this.HttpService.getLocalization().subscribe(
-      (result: LocalizationResponse) => {
-        this.rows = result.columns;
-        this.languages = result.languages;
-        this.defaultLanguage = result.defaultLanguage;
-        for (let item of Object.keys(result.localization)) {
-          this.localization.push({
-            language: item,
-            ...(<any>result.localization)[item],
-          });
-        }
-        this.sortRows();
-      }
-    );
+    let entity = this.xrmService.getCurrentEntity();
+    let requestData = new LocalizationRequest();
+    requestData.EntityLogicalName = 'sb_goaltemplate';
+    requestData.EntityId = '261b795e-765d-ec11-8f8f-000d3a2b8519';
+    requestData.Method = 'GET';
+    console.log(requestData);
+    this.xrmService.callActionTracking(this.ACTION_TRACKING_NAME,
+      requestData)
+      .subscribe({
+        next: (result) => {
+          let responseObj = JSON.parse(result.Response);
+          if (responseObj.Code == 1 && responseObj.Message) {
+            let messageObj = JSON.parse(responseObj.Message);
+            this.handleLocalizationResponse(messageObj);
+          }
+          else {
+            this.handleIncorrectResponse(responseObj.Message);
+          }
+
+        }, error: (err) => { this.handleError(err) }
+      });
   }
 
-  sortRows() {
-    this.rows?.sort((current, next) => current.localeCompare(next));
+  onSubmit(formParam: NgForm) {
+    let entity = this.xrmService.getCurrentEntity();
+    let requestData = new LocalizationRequest();
+    requestData.EntityLogicalName = 'sb_goaltemplate';
+    requestData.EntityId = '261b795e-765d-ec11-8f8f-000d3a2b8519';
+    requestData.Method = 'PUT';
+    requestData.Data = JSON.stringify(this.collectData(formParam));
+    console.log(requestData);
+    this.xrmService.callActionTracking(this.ACTION_TRACKING_NAME, requestData)
+      .subscribe({
+        next: (result) => {
+          console.log(result);
+          let resultObj = JSON.parse(result.Response);
+          if (resultObj.Code == 1) {
+            this.isSaved = true;
+            setTimeout(() => { this.isSaved = false; }, 5000);
+          }
+          else {
+            this.handleIncorrectResponse(resultObj.Message);
+          }
+        }, error: (err) => { this.handleError(err) }
+      });
   }
 
   getColumnLocalization(column: string, language: string): string {
     let result = this.localization.filter(
-      (i) => i.language == language && i.hasOwnProperty(column)
+      (loc) => loc.language == language && loc.hasOwnProperty(column)
     );
 
     if (result) {
@@ -57,14 +89,7 @@ export class LocalizationTableComponent implements OnInit {
     } else return '';
   }
 
-  onSubmit(formParam: NgForm) {
-    debugger;
-    console.log(formParam);
-    let data = this.collectData(formParam);
-    this.HttpService.save(data).subscribe((result) => console.log(result));
-  }
-
-  collectData(formParam: NgForm): any {
+  private collectData(formParam: NgForm): any {
     let data: any = {};
     let cellKeys = Object.keys(formParam.value);
     cellKeys.forEach((key) => {
@@ -80,6 +105,34 @@ export class LocalizationTableComponent implements OnInit {
     return data;
   }
 
-  public rows: string[] = [];
-  public localization = new Array<LocalizationItem>();
+  private handleLocalizationResponse(result: LocalizationResponse) {
+    this.defaultLanguage = result.defaultLanguage;
+    this.rows = result.columns;
+    this.languages = result.languages;
+    for (let item of Object.keys(result.localization)) {
+      this.localization.push({
+        language: item, ...(<any>result.localization)[item],
+      });
+    }
+    this.rows?.sort((current, next) => current.localeCompare(next));
+  }
+
+  private handleIncorrectResponse(message: any) {
+    this.isError = true;
+    if (message) {
+      this.responseText = JSON.parse(message);
+    } else {
+      this.responseText = 'Empty response';
+    }
+    setTimeout(() => {
+      this.isError = true;
+      this.responseText = '';
+    }, 5000);
+  }
+
+  private handleError(error: any) {
+    console.error(`Execution error is ${error}`);
+    this.isError = true;
+    setTimeout(() => this.isError = false, 5000);
+  }
 }

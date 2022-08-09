@@ -1,8 +1,16 @@
 
 td {
-  max-width: 100px;
+  max-width: 200px;
   max-height: 150px;
   padding: 5px;
+}
+
+td.field {
+  min-width: 100px;
+}
+
+th {
+  max-width: 200px;
 }
 
 th.title {
@@ -12,11 +20,15 @@ th.title {
 }
 
 th.brdr {
-  border-bottom: solid 1px #036ac4;
+  border-bottom: solid 1px #3b79b7;
 }
 
-td.field {
-  min-width: 100px;
+.col-padding {
+  padding-left: 1px;
+}
+
+.text-error {
+  color: rgb(177, 30, 30);
 }
 
 textarea {

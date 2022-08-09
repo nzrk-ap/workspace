@@ -1,7 +1,0 @@
-{
-  "sb_goaltemplate": {
-    "Name": "sb_name",
-    "Description": "sb_description",
-    "DataSource": "sb_datasource"
-  }
-}

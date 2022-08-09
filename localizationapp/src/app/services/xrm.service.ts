@@ -6,7 +6,7 @@ interface Context {
   getClientUrl(): string;
 }
 
-interface Xrm {}
+interface Xrm { }
 
 @Injectable({ providedIn: 'root' })
 export class XrmService {
@@ -29,8 +29,6 @@ export class XrmService {
   context: Context | undefined;
   xrm: Xrm | undefined;
 
-  private apiUrl = '/api/data/v9.2/';
-
   getClientUrl() {
     this.context?.getClientUrl();
   }
@@ -43,46 +41,37 @@ export class XrmService {
   }
 
   callActionTracking(actionName: string, data: any): Observable<any> {
-    let observable = new Observable((observer) => {
-      let request = {
-        ActionName: actionName,
-        Parameters: JSON.stringify(data),
 
-        getMetadata: function () {
-          return {
-            boundParameter: null,
-            parameterTypes: {
-              ActionName: {
-                typeName: 'Edm.String',
-                structuralProperty: 1,
-              },
-              Parameters: {
-                typeName: 'Edm.String',
-                structuralProperty: 1,
-              },
-            },
-            operationType: 0,
-            operationName: 'sb_ActionTracking',
-          };
+    // Parameters
+    var parameters = {
+      ActionName: actionName,
+      Parameters: JSON.stringify(data)
+    };
+
+    return new Observable((observer) => {
+      let globalContext = (<any>this.xrm).Utility.getGlobalContext();
+      let apiVersion = globalContext.getVersion().substring(0, 3);
+      fetch(globalContext.getClientUrl() + `/api/data/v${apiVersion}/sb_ActionTracking`, {
+        method: "POST",
+        headers: {
+          "OData-MaxVersion": "4.0",
+          "OData-Version": "4.0",
+          "Content-Type": "application/json; charset=utf-8",
+          "Accept": "application/json"
         },
-      };
-
-      (<any>this.xrm).WebApi.online
-        .execute(request)
-        .then(function success(result: any) {
-          if (result.ok) {
-            console.log('Success');
-            result.json().then((response: any) => {
-              observer.next(response);
-            });
-          }
-        })
-        .catch(function (error: any) {
-          console.log(error.message);
-          observer.error(error.message);
-        });
+        body: JSON.stringify(parameters)
+      }).then(
+        async function success(response) {
+          const json = await response.json();
+          if (response.ok) { return [response, json]; } else { throw json.error; }
+        }
+      ).then(function (responseObjects) {
+        var responseBody = responseObjects[1];
+        console.log(responseBody);
+        observer.next(responseBody);
+      }).catch(function (error) {
+        throw error;
+      });
     });
-
-    return observable;
   }
 }
